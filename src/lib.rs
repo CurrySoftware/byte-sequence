@@ -3,16 +3,13 @@ extern crate rand;
 #[macro_use]
 extern crate error_chain;
 
-pub mod errors;
+mod errors;
 
-use std::marker::PhantomData;
-use std::fmt;
 use std::result;
 
 use serde::de::{self, Visitor};
 
-use errors::*;
-
+pub use errors::{Error, ErrorKind, Result};
 
 pub trait Checkable: Sized {
     const NAME: &'static str;
@@ -27,18 +24,18 @@ macro_rules! byte_seq {
         #[derive(PartialOrd, Ord, PartialEq, Eq, Clone, Copy, Hash)]
         pub struct $name([u8; $count]);
 
-        impl Checkable for $name {
+        impl $crate::Checkable for $name {
             const NAME: &'static str = stringify!($name);
-            fn check(key: &str) -> Result<$name> {
+            fn check(key: &str) -> $crate::Result<$name> {
                 ensure!(key.chars().count() == ($count * 2),
-                        ErrorKind::InvalidKeyLen(key.to_string(), stringify!($name)));
+                       $crate::ErrorKind::InvalidKeyLen(key.to_string(), stringify!($name)));
 
                 let mut bytes: [u8; $count] = [0u8; $count];
                 for i in 0..$count {
                     if let Ok(byte) = u8::from_str_radix(&key[i*2..i*2+2], 16) {
                         bytes[i] = byte;
                     } else {
-                        bail!(ErrorKind::InvalidKeyChars(key.to_string(), stringify!($name)))
+                        bail!($crate::ErrorKind::InvalidKeyChars(key.to_string(), stringify!($name)))
                     }
                 }
                 Ok($name(bytes))
@@ -66,47 +63,48 @@ macro_rules! byte_seq {
             }
         }
 
-        impl fmt::Display for $name {
-            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        impl std::fmt::Display for $name {
+            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
                 write!(f, "{}({})", stringify!($name), self.to_string())
             }
         }
 
-        impl fmt::Debug for $name {
-            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        impl std::fmt::Debug for $name {
+            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
                 write!(f, "{}", self)
             }
         }
 
 
-        impl Serialize for $name {
-            fn serialize<S>(&self, serializer: S) -> result::Result<S::Ok, S::Error>
-                where S: Serializer
+        impl serde::Serialize for $name {
+            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+                where S: serde::Serializer
             {
                 serializer.serialize_str(&self.to_string())
             }
         }
 
 
-        impl<'de> Deserialize<'de> for $name {
-            fn deserialize<D>(deserializer: D) -> result::Result<Self, D::Error>
-                where D: Deserializer<'de>
+        impl<'de> serde::Deserialize<'de> for $name {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+                where D: serde::Deserializer<'de>
             {
-                deserializer.deserialize_str(CheckableVisitor{_type:PhantomData})
+                deserializer.deserialize_str($crate::CheckableVisitor{_type:std::marker::PhantomData})
             }
         }
+
     }
 }
 
 
 pub struct CheckableVisitor<T: Checkable> {
-    pub _type: PhantomData<T>,
+    pub _type: std::marker::PhantomData<T>,
 }
 
 impl<'de, Checked: Checkable> Visitor<'de> for CheckableVisitor<Checked> {
     type Value = Checked;
 
-    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
         formatter.write_str("An $name in String format!")
     }
 

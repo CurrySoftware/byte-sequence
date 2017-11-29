@@ -19,9 +19,11 @@ It also implements `Display`, `Debug`, `serde::Serialize`, `serde::Deserialize`,
 Complete example:
 
 ```rust
-
-
-use serde::{Serialize, Serializer, Deserialize, Deserializer};
+#[macro_use]
+extern crate byte_sequence;
+use serde;
+use std;
+use byte_sequence::Checkable;
 
 byte_seq!(ApiKey; 32);
 
@@ -39,4 +41,18 @@ fn example() {
     assert_eq!(key.to_string(), "BBC47F308F3D02C3C6C3D6C9555296A64407FE72AD92DE8C7344D610CFFABF67");
 }
 
+```
+
+
+You can also extend the generated structs.
+For example add a public part of the ApiKey:
+
+```rust
+impl ApiKey {
+    pub fn public_part(&self) -> PublicApiKey {
+        let mut pub_data = [0u8; 8];
+        pub_data.copy_from_slice(&self.0[0..8]);
+        PublicApiKey(pub_data)
+    }
+}
 ```
