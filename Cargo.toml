@@ -1,0 +1,9 @@
+[package]
+name = "byte_sequence"
+version = "0.1.0"
+authors = ["Jakob Demler <jdemler@curry-software.com>"]
+
+[dependencies]
+rand = "0.3"
+serde = "*"
+error-chain = "*"
