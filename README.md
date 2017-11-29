@@ -1,6 +1,6 @@
 # Byte Sequences
 
-This create provides some utility to create byte sequences like ApiKeys or SessionIds.
+This crate provides some utility to create byte sequences like ApiKeys or SessionIds.
 It contains a macro that lets you specify the name and length in bytes of the sequence.
 The macro than creates a struct that has following methods
 
