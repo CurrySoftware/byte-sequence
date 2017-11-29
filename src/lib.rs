@@ -23,7 +23,6 @@ pub trait Checkable: Sized {
 #[macro_export]
 macro_rules! byte_seq {
     ($name:ident; $count:expr) => {
-        use serde::{Serialize, Serializer, Deserialize, Deserializer};
 
         #[derive(PartialOrd, Ord, PartialEq, Eq, Clone, Copy, Hash)]
         pub struct $name([u8; $count]);
@@ -125,6 +124,7 @@ impl<'de, Checked: Checkable> Visitor<'de> for CheckableVisitor<Checked> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde::{Serialize, Serializer, Deserialize, Deserializer};
 
     byte_seq!(Test; 10);
 
@@ -133,4 +133,21 @@ mod tests {
         let a = Test::generate_new();
         assert_eq!(a, Test::check(&a.to_string()).unwrap());
     }
+
+    byte_seq!(ApiKey; 32);
+
+    #[test]
+    fn example() {
+        // Creates a new ApiKey containing 32 random bytes using a thread_rng
+        let key = ApiKey::generate_new();
+
+        // The to_string method creates a hex encoded string:
+        // i.e. 'BBC47F308F3D02C3C6C3D6C9555296A64407FE72AD92DE8C7344D610CFFABF67'
+        assert_eq!(key.to_string().len(), 64);
+
+        // you can also do it the other way around: Parse a string into an ApiKey
+        let key = ApiKey::check("BBC47F308F3D02C3C6C3D6C9555296A64407FE72AD92DE8C7344D610CFFABF67").unwrap();
+        assert_eq!(key.to_string(), "BBC47F308F3D02C3C6C3D6C9555296A64407FE72AD92DE8C7344D610CFFABF67");
+    }
+
 }
