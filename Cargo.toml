@@ -1,6 +1,6 @@
 [package]
 name = "byte-sequence"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Jakob Demler <jdemler@curry-software.com>"]
 description = "A little marco that creates structs to be used as byte sequences (for ApiKeys, SessionIds and so on)"
 repository = "https://github.com/CurrySoftware/byte-sequence"
