@@ -1,6 +1,6 @@
 [package]
 name = "byte-sequence"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Jakob Demler <jdemler@curry-software.com>"]
 description = "A little marco that creates structs to be used as byte sequences (for ApiKeys, SessionIds and so on)"
 repository = "https://github.com/CurrySoftware/byte-sequence"
@@ -8,6 +8,6 @@ readme = "README.md"
 license = "MIT/BSD-3-Clause"
 
 [dependencies]
-rand = "0.3"
+rand = "0.5"
 serde = "1.0"
-error-chain = "0.11"
+failure = "0.1"

@@ -10,7 +10,7 @@ fn generate_new() -> Self
 
 fn to_string() -> String
 
-fn check(key: &str) -> Result<Self>;
+fn check(key: &str) -> std::result::Result<Self, failure::Error>;
 
 ```
 
@@ -21,6 +21,7 @@ Complete example:
 ```rust
 #[macro_use]
 extern crate byte_sequence;
+extern crate rand;
 use serde;
 use std;
 use byte_sequence::Checkable;
