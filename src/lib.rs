@@ -7,6 +7,8 @@ use std::result;
 
 use serde::de::{self, Visitor};
 
+pub type Error = failure::Error;
+
 pub trait Checkable: Sized {
     const NAME: &'static str;
     fn check(key: &str) -> Result<Self, failure::Error>;
@@ -42,7 +44,7 @@ macro_rules! byte_seq {
 
         impl $crate::Checkable for $name {
             const NAME: &'static str = stringify!($name);
-            fn check(key: &str) -> std::result::Result<$name, $crate::failure::Error> {
+            fn check(key: &str) -> std::result::Result<$name, $crate::Error> {
                 ensure!(
                     key.chars().count() == ($count * 2),
                     $crate::ByteSequenceError::InvalidKeyLen {
